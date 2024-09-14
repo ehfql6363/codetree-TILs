@@ -96,7 +96,8 @@ public class Main {
 //            System.out.println("루돌프 움직이고 난 뒤");
 //            for(int[] a : map) System.out.println(Arrays.toString(a));
 //            System.out.println();
-            
+//            System.out.println("루돌프 움직이고 난 뒤 retire : " + Arrays.toString(retire));
+//            System.out.println("루돌프 움직이고 난 뒤 score : " + Arrays.toString(scores));
             // 산타 : 루돌프쪽으로 이동
             moveToRudolf(santas, rudolf);
             
@@ -106,12 +107,13 @@ public class Main {
 //            System.out.println();
             // 디버깅
 //            for(int[] a : map) System.out.println(Arrays.toString(a));
-            
+//            System.out.println("루돌프 움직이고 난 뒤 retire : " + Arrays.toString(retire));
+//            System.out.println("산타 움직이고 난 뒤 score : " + Arrays.toString(scores));
             // 루돌프와 산타가 이동을 마치면
             // 살아 남은 산타에게 점수 1점 추가
             getPoint();
 //            System.out.println("retire : " + Arrays.toString(retire));
-//            System.out.println("score : " + Arrays.toString(scores));
+//            System.out.println("살아 남은 산타에게 1점 추가 후 score : " + Arrays.toString(scores));
         }
     }
     static void getPoint() {
@@ -206,6 +208,7 @@ public class Main {
                 if(!isInRange(dr, dc)) continue;
                 if(map[dr][dc] > 0) continue;
                 if(map[dr][dc] == -1) { // 루돌프랑 부딪히면
+//                	System.out.println("부딪힌 산타 : " + santa.toString());
                     bump(santas, santa, (j + 2) % 4, dr, dc, 1, d); // 부딪히는 함수
                     break; // 주변 탐색 안해도 됨.
                 }
@@ -221,11 +224,11 @@ public class Main {
             }
             
             map[row][col] = 0; // 이전 히스토리 삭제
+            if(retire[santa.no]) continue;
             map[santa.row][santa.col] = santa.no; // 산타 이동
             
-//            System.out.println("한 명씩 이동 후");
+//            System.out.println(i + "번 산타 이동 후");
 //            for(int[] a : map) System.out.println(Arrays.toString(a));
-//            System.out.println(Arrays.toString(retire));
 //            System.out.println();
         }
     }
@@ -247,7 +250,6 @@ public class Main {
         
         if(!isInRange(row, col)) {
             retire[santa.no] = true;
-            map[santa.row][santa.col] = 0;
             return;
         }
         
