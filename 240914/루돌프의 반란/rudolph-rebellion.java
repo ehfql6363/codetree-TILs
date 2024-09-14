@@ -1,7 +1,5 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
     static int n; // 게임판 크기
@@ -39,7 +37,6 @@ public class Main {
         }
     }
     public static void main(String[] args) throws Exception{
-        // 여기에 코드를 작성해주세요.
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         StringBuilder sb = new StringBuilder();
@@ -82,38 +79,18 @@ public class Main {
             // 가장 가까이 있는 산타 정하기
             Santa target = getNearSanta(santas, rudolf);
             
-//            System.out.println("=============== " + (round + 1) + " ==================");
-            
             // 없으면 나가기
             if(target == null) return;
-//            System.out.println("가장 가까운 산타 : " + target.toString());
-            
             
             // 루돌프 : 가장 가까운 산타쪽으로 이동
             moveToSanta(santas, target, rudolf);
             
-            // 디버깅
-//            System.out.println("루돌프 움직이고 난 뒤");
-//            for(int[] a : map) System.out.println(Arrays.toString(a));
-//            System.out.println();
-//            System.out.println("루돌프 움직이고 난 뒤 retire : " + Arrays.toString(retire));
-//            System.out.println("루돌프 움직이고 난 뒤 score : " + Arrays.toString(scores));
             // 산타 : 루돌프쪽으로 이동
             moveToRudolf(santas, rudolf);
             
-            // 디버깅
-//            System.out.println("산타 움직이고 난 뒤");
-//            for(int[] a : map) System.out.println(Arrays.toString(a));
-//            System.out.println();
-            // 디버깅
-//            for(int[] a : map) System.out.println(Arrays.toString(a));
-//            System.out.println("루돌프 움직이고 난 뒤 retire : " + Arrays.toString(retire));
-//            System.out.println("산타 움직이고 난 뒤 score : " + Arrays.toString(scores));
             // 루돌프와 산타가 이동을 마치면
             // 살아 남은 산타에게 점수 1점 추가
             getPoint();
-//            System.out.println("retire : " + Arrays.toString(retire));
-//            System.out.println("살아 남은 산타에게 1점 추가 후 score : " + Arrays.toString(scores));
         }
     }
     static void getPoint() {
@@ -163,7 +140,6 @@ public class Main {
             
             if(!isInRange(dr, dc)) continue; // 장외면 패스
             if(dr == target.row && dc == target.col) { // 산타랑 부딪히면
-//                System.out.println("dir = " + i);
                 bump(santas, target, i, dr, dc, 2, c); // 충돌 메서드 실행
                 row = dr;
                 col = dc;
@@ -195,7 +171,6 @@ public class Main {
                 continue; // 패스
             }
             
-//            System.out.println(i + " : " + santa.no);
             int row = santa.row; // 이동 전 row 저장
             int col = santa.col; // 이동 후 col 저장
             double dist = Math.pow(row - rudolf.row, 2) + 
@@ -208,7 +183,6 @@ public class Main {
                 if(!isInRange(dr, dc)) continue;
                 if(map[dr][dc] > 0) continue;
                 if(map[dr][dc] == -1) { // 루돌프랑 부딪히면
-//                	System.out.println("부딪힌 산타 : " + santa.toString());
                     bump(santas, santa, (j + 2) % 4, dr, dc, 1, d); // 부딪히는 함수
                     break; // 주변 탐색 안해도 됨.
                 }
@@ -227,9 +201,6 @@ public class Main {
             if(retire[santa.no]) continue;
             map[santa.row][santa.col] = santa.no; // 산타 이동
             
-//            System.out.println(i + "번 산타 이동 후");
-//            for(int[] a : map) System.out.println(Arrays.toString(a));
-//            System.out.println();
         }
     }
     
@@ -244,7 +215,6 @@ public class Main {
         int col = cc;
         row += rows[dir] * push;
         col += cols[dir] * push;
-//        System.out.println(row + " " + col);
         
         scores[santa.no] += push;
         
