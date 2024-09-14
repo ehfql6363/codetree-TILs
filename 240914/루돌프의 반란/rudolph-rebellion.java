@@ -1,5 +1,7 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
     static int n; // 게임판 크기
@@ -234,7 +236,8 @@ public class Main {
     }
     
     static void bump(Santa[] santas, Santa santa, int dir, int rr, int cc, int stun, int push) {
-        int row = rr;
+    	map[santa.row][santa.col] = 0;
+    	int row = rr;
         int col = cc;
         row += rows[dir] * push;
         col += cols[dir] * push;
@@ -248,10 +251,8 @@ public class Main {
             return;
         }
         
-        updateSantaPos(santas, row, col, dir);
+        updateSantaPos(santas, santa, row, col, dir);
         updateMap(santas);
-        
-        map[santa.row][santa.col] = 0;
         
         // 타겟 산타의 위치 및 상태 갱신
         map[row][col] = santa.no;
@@ -266,7 +267,7 @@ public class Main {
             map[sa.row][sa.col] = sa.no;
         }
     }
-    static void updateSantaPos(Santa[] santas, int row, int col, int dir) {
+    static void updateSantaPos(Santa[] santas, Santa target, int row, int col, int dir) {
         int nr = row;
         int nc = col;
         while(true) { // 밀려날 위치에 다른 산타가 있다면
@@ -280,6 +281,10 @@ public class Main {
             
             nr = s.row;
             nc = s.col;
+            if(!isInRange(nr, nc)) {
+            	retire[s.no] = true;
+            	break;
+            }
         }
     }
 }
