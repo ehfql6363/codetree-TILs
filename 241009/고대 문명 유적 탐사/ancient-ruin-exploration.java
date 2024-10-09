@@ -14,7 +14,6 @@ public class Main {
 	
 	static int[] rotationArr;
 	static int index;
-	static boolean found;
 	static int ans;
 	
 	static List<int[]> finalBag;
@@ -94,6 +93,7 @@ public class Main {
 			}
 			
 			fill();
+			
 			reSearch();
 		}
 	}
@@ -141,8 +141,7 @@ public class Main {
 			}
 		}
 		
-		if(		finalBag.size() <  subBag.size()					) change(row, col, dir);
-		else if(finalBag.size() == subBag.size() && record.dir > dir) change(row, col, dir);
+		if(shouldChange(row, col, dir)) change(row, col, dir);
 	}
 	
 	static void reSearch() {
@@ -188,6 +187,24 @@ public class Main {
 		}
 		
 		if(list.size() >= 3) putIn(list, subBag);
+	}
+	
+	static boolean shouldChange(int row, int col, int dir) {
+		if (finalBag.size() < subBag.size()) {
+	        return true;
+	    }
+	    
+	    if (finalBag.size() == subBag.size()) {
+	        if (record.dir == dir) {
+	            if (record.position[1] == col) {
+	                return record.position[0] > row;
+	            }
+	            return record.position[1] > col;
+	        }
+	        return record.dir > dir;
+	    }
+
+	    return false;
 	}
 	
 	static void change(int row, int col, int dir) {
