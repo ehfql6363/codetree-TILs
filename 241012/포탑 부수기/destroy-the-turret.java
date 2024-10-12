@@ -62,7 +62,6 @@ public class Main {
 		
 		for(int i = 0; i < k; i++) {
 			game();
-			increaseSeq();
 		}
 		
 //		printMap();
@@ -86,7 +85,6 @@ public class Main {
 //		System.out.println("공격 전");
 //		printMap();
 //		System.out.println();
-//		System.out.println(defencer);
 		
 		attack(attacker, defencer);
 //		System.out.println("공격 후");
@@ -97,6 +95,9 @@ public class Main {
 //		System.out.println("정비 후");
 //		printMap();
 //		System.out.println();
+		
+		increaseSeq(attacker);
+		
 	}
 	
 	static int weakest(Turret o1, Turret o2) {
@@ -154,7 +155,7 @@ public class Main {
 		
 		findDirection(from, attacker, defencer);
 		
-		if(from[defencer.row * m + defencer.col] == Integer.MIN_VALUE) return false;
+		if(from[defencer.row * m + defencer.col] == -2) return false;
 		
 		descPower(from, attacker, defencer);
 		
@@ -188,7 +189,7 @@ public class Main {
 	static void descPower(int[] from, Turret attacker, Turret defencer) {
 		int row = defencer.row;
 		int col = defencer.col;
-		while(from[row * m + col] != -1) {
+		while(from[row * m + col] > -1) {
 			Turret target = map[row][col];
 			
 			if(defencer.row == target.row && defencer.col == target.col)
@@ -197,10 +198,11 @@ public class Main {
 				target.power -= attacker.power / 2;
 			
 			if(target.power <= 0) {
-				defencers.remove(target);
-				attackers.remove(target);
+				boolean rd = defencers.remove(target);
+				boolean ra = attackers.remove(target);
+				target.power = 0;
 //				System.out.print("포탑 삭제 : ");
-//				System.out.println(defencers.remove(target));
+//				System.out.println(rd + " " + ra);
 			}
 			
 			attacked[row][col] = true;
@@ -219,11 +221,17 @@ public class Main {
 		int col = defencer.col;
 		
 		map[row][col].power -= attacker.power;
+		if(map[row][col].power <= 0) {
+			map[row][col].power = 0;
+			defencers.remove(map[row][col]);
+			attackers.remove(map[row][col]);
+		}
+		
 		attacked[row][col] = true;
 		
 		for(int i = 0; i < 8; i++) {
-			int nr = (row + rows8[i]) % n;
-			int nc = (col + cols8[i]) % m;
+			int nr = (row + rows8[i] + n) % n;
+			int nc = (col + cols8[i] + m) % m;
 			
 			if(isRange(nr, nc) && !(attacker.row == nr && attacker.col == nc)) {
 				map[nr][nc].power -= attacker.power / 2;
@@ -251,10 +259,11 @@ public class Main {
 		}
 	}
 
-	static void increaseSeq() {
+	static void increaseSeq(Turret attacker) {
 		for(int i = 0; i < n; i++) {
 			for(int j = 0; j < m; j++) {
 				if(map[i][j].power == 0) continue;
+				if(map[i][j] == attacker) continue;
 				map[i][j].seq++;
 			}
 		}
