@@ -1,13 +1,12 @@
 import java.io.*;
 import java.util.*;
 
-public class Main {
+public class Main{
 	static int n, m, k;
 	static Turret[][] map;
 	
 	static boolean[][] attacked;
-	static List<Turret> attackers;
-	static List<Turret> defencers;
+	static List<Turret> turrets;
 	
 	static int[] rows4 = {0, 1, 0, -1};
 	static int[] cols4 = {1, 0, -1, 0};
@@ -41,9 +40,7 @@ public class Main {
 		k = Integer.parseInt(st.nextToken());
 		
 		map = new Turret[n][m];
-		attacked = new boolean[n][m];
-		attackers = new ArrayList<>();
-		defencers = new ArrayList<>();
+		turrets = new ArrayList<>();
 		
 		for(int i = 0; i < n; i++) {
 			st = new StringTokenizer(br.readLine());
@@ -54,19 +51,18 @@ public class Main {
 				map[i][j] = turret;
 				
 				if(power > 0) {
-					attackers.add(turret);
-					defencers.add(turret);
+					turrets.add(turret);
 				}
 			}
 		}
 		
 		for(int i = 0; i < k; i++) {
+//			System.out.println("round " + (i + 1));
+			attacked = new boolean[n][m];
 			game();
 		}
 		
-//		printMap();
-		
-		System.out.println(findStrongest().power);
+		System.out.println(getStrongest().power);
 	}
 	
 	static void printMap() {
@@ -77,10 +73,10 @@ public class Main {
 	}
 	
 	static void game() {
-		Turret attacker = findWeakest();
-		Turret defencer = findStrongest();
+		Turret attacker = getWeakest();
+		Turret defencer = getStrongest();
 		
-		attacker.power += n + m;
+		attacker.power += (n + m);
 		
 //		System.out.println("공격 전");
 //		printMap();
@@ -100,7 +96,7 @@ public class Main {
 		
 	}
 	
-	static int weakest(Turret o1, Turret o2) {
+	static int sortingCondition(Turret o1, Turret o2) {
 		int r1 = o1.row, c1 = o1.col;
 		int r2 = o2.row, c2 = o2.col;
 		
@@ -114,32 +110,14 @@ public class Main {
 		return o1.power - o2.power;
 	}
 	
-	static int strongest(Turret o1, Turret o2) {
-		int r1 = o1.row, c1 = o1.col;
-		int r2 = o2.row, c2 = o2.col;
-		
-		if(o2.power == o1.power) {
-			if(o2.seq == o1.seq) {
-				if(r1 + c1 == r2 + c2) return c1 - c2;
-				return (r1 + c1) - (r2 + c2);
-			}
-			return o2.seq - o1.seq;
-		}
-		return o2.power - o1.power;
+	static Turret getWeakest() {
+		Collections.sort(turrets, (o1, o2) -> sortingCondition(o1, o2));
+		return turrets.get(0);
 	}
 	
-	static Turret findWeakest() {
-		Collections.sort(attackers, (o1, o2) -> weakest(o1, o2));
-//		System.out.println("공격 리스트" + attackers);
-		Turret attacker = attackers.get(0);
-		return attacker;
-	}
-	
-	static Turret findStrongest() {
-		Collections.sort(defencers, (o1, o2) -> strongest(o1, o2));
-//		System.out.println("수비 리스트" + defencers);
-		Turret defencer = defencers.get(0);
-		return defencer;
+	static Turret getStrongest() {
+		Collections.sort(turrets, (o1, o2) -> sortingCondition(o1, o2));
+		return turrets.get(turrets.size() - 1);
 	}
 	
 	static void attack(Turret attacker, Turret defencer) {
@@ -187,10 +165,13 @@ public class Main {
 	}
 	
 	static void descPower(int[] from, Turret attacker, Turret defencer) {
+//		System.out.println("레이저 경로");
 		int row = defencer.row;
 		int col = defencer.col;
 		while(from[row * m + col] > -1) {
 			Turret target = map[row][col];
+			
+//			System.out.print("(" + target + ")" + " <- ");
 			
 			if(defencer.row == target.row && defencer.col == target.col)
 				target.power -= attacker.power;
@@ -198,11 +179,10 @@ public class Main {
 				target.power -= attacker.power / 2;
 			
 			if(target.power <= 0) {
-				boolean rd = defencers.remove(target);
-				boolean ra = attackers.remove(target);
+				boolean ra = turrets.remove(target);
 				target.power = 0;
 //				System.out.print("포탑 삭제 : ");
-//				System.out.println(rd + " " + ra);
+//				System.out.println(ra);
 			}
 			
 			attacked[row][col] = true;
@@ -213,6 +193,7 @@ public class Main {
 			row = r;
 			col = c;
 		}
+//		System.out.println("(" + map[row][col] + ")");
 		attacked[row][col] = true;
 	}
 	
@@ -223,8 +204,7 @@ public class Main {
 		map[row][col].power -= attacker.power;
 		if(map[row][col].power <= 0) {
 			map[row][col].power = 0;
-			defencers.remove(map[row][col]);
-			attackers.remove(map[row][col]);
+			turrets.remove(map[row][col]);
 		}
 		
 		attacked[row][col] = true;
@@ -236,12 +216,13 @@ public class Main {
 			if(isRange(nr, nc) && !(attacker.row == nr && attacker.col == nc)) {
 				map[nr][nc].power -= attacker.power / 2;
 				if(map[nr][nc].power <= 0) {
-					defencers.remove(map[nr][nc]);
-					attackers.remove(map[nr][nc]);
+					turrets.remove(map[nr][nc]);
 				}
 				attacked[nr][nc] = true;
 			}
 		}
+		
+		attacked[attacker.row][attacker.col] = true;
 	}
 	
 	static boolean isRange(int nr, int nc) {
@@ -268,4 +249,5 @@ public class Main {
 			}
 		}
 	}
+
 }
